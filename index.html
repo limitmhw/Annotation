@@ -1,0 +1,459 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>canvas</title>
+   <script src="js/jquery-1.7.2.min.js"></script>
+
+    <style type="text/css">
+	 #imageView_container{ border: 2px solid #000000; }
+	 #rotImg{ visibility:visible; position: absolute; }
+	.obtn{position:absolute;width: 10px;height: 10px;border-radius: 50%;border: none;} .obtn-no-save{background-color:red;}
+	.obtn-save{background-color:#32CD32;} 
+	/* border-radius */
+	</style>
+</head>
+<body>
+<!--
+<div style="width:500px;height:500px; overflow:scroll;">
+<canvas id="layer1"  width="0" height="0" >
+
+<span>你的浏览器不支持canvas</span>
+</canvas>
+<div>
+-->
+
+<canvas id="layer1" width="800" height="800" 
+  style="position: absolute; left: 0; top: 0; z-index: 3;"></canvas> 
+<canvas id="layer2" width="800" height="800" 
+  style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas> 
+<canvas id="layer3" width="800" height="800" 
+  style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas> 
+<p id='showInfo'  style="position: absolute; left:0; top:490px; z-index: 10;"></p>
+      <br/>
+<div id='btnlist' style="position: absolute;left:850px;top:0"></div>
+
+<input type="button" id="prepic" value="上一张" style="position: absolute; left:450px; top:540px; z-index: 10;">
+<input type="button" id="nextpic" value="下一张" style="position: absolute; left:550px; top:540px; z-index: 10;">
+
+<input type="button" id="preperson" value="上一个人" style="position: absolute; left:250px; top:540px; z-index: 10;">
+<input type="button" id="nextperson" value="下一个人" style="position: absolute; left:350px; top:540px; z-index: 10;">  
+<input type="text" id="showperson" disabled style="position: absolute; left:0; top:540px; z-index: 10;">
+
+
+<input type="button" id="tobig" value="放大" style="position: absolute; left:0; top:570px; z-index: 10;">
+<input type="button" id="tosmall" value="缩小" style="position: absolute; left:200px; top:570px; z-index: 10;">
+<input type="button" id="addnew" value="添加新人" style="position: absolute; left:300px; top:570px; z-index: 10;">
+
+
+<input type="button" id="lockinfo" value="锁定地址"  style="position: absolute; left:600px; top:600px; z-index: 10;">
+<input type="text" value="C://1.txt"  id="filePath" style="position: absolute; left:0; top:600px; z-index: 10;">
+<input type="text" value="G:\work\data\out_jpg"  id="openPath" style="position: absolute; left:200px; top:600px; z-index: 10;">
+<input type="text" value="C:\Users\MHW\Desktop\1" id="savePath" style="position: absolute; left:400px; top:600px; z-index: 10;">
+
+<script type="text/javascript" >
+	  var fs = require("fs");
+	  var pos=[{"x":0.46774839743589747,"y":0.12009373169302871,"name":"左上外1"},{"x":0.46153846153846145,"y":0.15817223198594021,"name":"左上外2"},{"x":0.41266025641025633,"y":0.16813122437024017,"name":"左上外3"},{"x":0.375801282051282,"y":0.17691857059168128,"name":"左上外4"},{"x":0.34214743589743585,"y":0.20210896309314585,"name":"左上外5"},{"x":0.29166666666666663,"y":0.2355008787346221,"name":"左上外6"},{"x":0.23717948717948714,"y":0.26713532513181015,"name":"左上外7"},{"x":0.1706730769230769,"y":0.299941417691857,"name":"左上外8"},{"x":0.0969551282051282,"y":0.34504979496192145,"name":"左上外9"},{"x":0.11698717948717946,"y":0.35735207967193905,"name":"左上内1"},{"x":0.19871794871794868,"y":0.3280609256004686,"name":"左上内2"},{"x":0.2652243589743589,"y":0.29701230228471,"name":"左上内3"},{"x":0.3253205128205128,"y":0.26186291739894546,"name":"左上内4"},{"x":0.39423076923076916,"y":0.226713532513181,"name":"腰左1"},{"x":0.40064102564102555,"y":0.255418863503222,"name":"腰左2"},{"x":0.4134615384615384,"y":0.2852958406561218,"name":"腰左3"},{"x":0.4278846153846153,"y":0.325717633274751,"name":"腰左4"},{"x":0.4190705128205127,"y":0.35910954891622726,"name":"腰左5"},{"x":0.6025641025641024,"y":0.2261277094317516,"name":"腰右1"},{"x":0.595352564102564,"y":0.25366139425893375,"name":"腰右2"},{"x":0.5873397435897435,"y":0.28705330990041006,"name":"腰右3"},{"x":0.5729166666666665,"y":0.3268892794376098,"name":"腰右4"},{"x":0.5849358974358974,"y":0.35735207967193905,"name":"腰右5"},{"x":0.5304487179487178,"y":0.11950790861159928,"name":"右上外1"},{"x":0.5400641025641024,"y":0.1570005858230814,"name":"右上外2"},{"x":0.5857371794871794,"y":0.16637375512595193,"name":"右上外3"},{"x":0.6233974358974358,"y":0.17633274751025188,"name":"右上外4"},{"x":0.6474358974358974,"y":0.19449326303456355,"name":"右上外5"},{"x":0.6963141025641024,"y":0.22495606326889275,"name":"右上外6"},{"x":0.7700320512820511,"y":0.27240773286467485,"name":"右上外7"},{"x":0.830128205128205,"y":0.3016988869361452,"name":"右上外8"},{"x":0.8966346153846152,"y":0.3409490333919156,"name":"右上外9"},{"x":0.8822115384615383,"y":0.35735207967193905,"name":"右上内1"},{"x":0.8084935897435896,"y":0.33040421792618624,"name":"右上内2"},{"x":0.7387820512820511,"y":0.3022847100175747,"name":"右上内3"},{"x":0.6682692307692306,"y":0.25951962507322784,"name":"右上内4"},{"x":0.3982371794871794,"y":0.40246045694200344,"name":"左下外1"},{"x":0.38301282051282043,"y":0.453427065026362,"name":"左下外2"},{"x":0.3685897435897435,"y":0.5395430579964849,"name":"左下外3"},{"x":0.3741987179487179,"y":0.6321031048623315,"name":"左下外4"},{"x":0.3653846153846153,"y":0.6736965436438195,"name":"左下外5"},{"x":0.34214743589743585,"y":0.7369654364381956,"name":"左下外6"},{"x":0.34214743589743585,"y":0.7932044522554188,"name":"左下外7"},{"x":0.34695512820512814,"y":0.852372583479789,"name":"左下外8"},{"x":0.391826923076923,"y":0.8535442296426478,"name":"左下内1"},{"x":0.4038461538461538,"y":0.7973052138254246,"name":"左下内2"},{"x":0.4166666666666666,"y":0.7422378441710602,"name":"左下内3"},{"x":0.42708333333333326,"y":0.6807264206209723,"name":"左下内4"},{"x":0.44391025641025633,"y":0.638547158758055,"name":"左下内5"},{"x":0.4687499999999999,"y":0.5547744581136496,"name":"左下内6"},{"x":0.4799679487179486,"y":0.4680726420620972,"name":"左下内7"},{"x":0.6009615384615383,"y":0.4042179261862917,"name":"右下外1"},{"x":0.6201923076923076,"y":0.4528412419449326,"name":"右下外2"},{"x":0.627403846153846,"y":0.5330990041007615,"name":"右下外3"},{"x":0.6258012820512819,"y":0.6338605741066197,"name":"右下外4"},{"x":0.6346153846153845,"y":0.6754540128881077,"name":"右下外5"},{"x":0.6554487179487178,"y":0.734622144112478,"name":"右下外6"},{"x":0.657852564102564,"y":0.7896895137668423,"name":"右下外7"},{"x":0.6538461538461537,"y":0.8512009373169301,"name":"右下外8"},{"x":0.6113782051282051,"y":0.852372583479789,"name":"右下内1"},{"x":0.5969551282051281,"y":0.794961921499707,"name":"右下内2"},{"x":0.5809294871794871,"y":0.7398945518453426,"name":"右下内3"},{"x":0.5697115384615383,"y":0.6795547744581135,"name":"右下内4"},{"x":0.5504807692307692,"y":0.6344463971880491,"name":"右下内5"},{"x":0.5288461538461537,"y":0.5512595196250731,"name":"右下内6"},{"x":0.5192307692307692,"y":0.4680726420620972,"name":"右下内7"}];
+ $(function () {
+	  //图层一
+	  var canvas1;
+	  var context1;
+	  //图层二
+	  var context2;
+	  var context2;
+	  //图层三
+	  var canvas3;
+	  var context3;
+	  //按下位置
+	  var downX,downY;
+	  //图片渲染位置
+	  var imgPosX=0,imgPosY=0;
+	  //拖拽标志
+	  var isdrag=false;
+	  var imgPath='1.jpg';
+	  //缩放比例
+	  var imgScale=1;
+	  //图片长宽
+	  var imgWidth;
+	  var imgHeight;
+
+	  //全局数据
+	  var data_arr = [];
+	  //初始化值
+      var uuNum = -100000;
+	  //当前点击下的点
+	  var now_x = uuNum;
+      var now_y = uuNum;
+	  var baseFileOpenPath;
+	  var baseFileSavePath;
+	  var filePath='';
+	  var imgList=[];
+	  var now_pic_idx=0;
+	  var now_people=0;
+	  
+	  
+      function getLocation(x, y) {
+			var bbox = canvas1.getBoundingClientRect();
+			return {
+				x: (x - bbox.left) * (canvas1.width / bbox.width),
+				y: (y - bbox.top) * (canvas1.height / bbox.height)
+			};
+		}
+		function drawHorizontalLine(y) {
+			context1.beginPath();
+			context1.moveTo(0, y);
+			context1.lineWidth = 1;//线条的宽度
+			context1.strokeStyle = "#f00";//线条的颜色
+			context1.lineTo(canvas1.width, y);
+			context1.stroke();
+			context1.closePath();
+		}
+		function drawVerticalLine(x) {
+			context1.beginPath();
+			context1.lineWidth = 1;//线条的宽度
+			context1.strokeStyle = "#f00";//线条的颜色
+			context1.moveTo(x, 0);
+			context1.lineTo(x, canvas1.height);
+			context1.stroke();
+			context1.closePath();
+		}
+
+ 	function createcanvas() {
+ 		canvas1 = document.getElementById('layer1');
+ 		context1 = canvas1.getContext('2d');
+ 		canvas2 = document.getElementById('layer2');
+ 		context2 = canvas2.getContext('2d');
+		
+ 		canvas3 = document.getElementById('layer3');
+ 		context3 = canvas3.getContext('2d');
+ 		canvas1.onmousemove = function (e) {
+ 			var location = getLocation(e.clientX, e.clientY);
+ 			context1.clearRect(0, 0, canvas1.width, canvas1.height);
+ 			drawHorizontalLine(location.y);
+ 			drawVerticalLine(location.x);
+			if (isdrag) {
+ 				//拖拽图片
+ 				imgPosX = imgPosX + e.clientX - downX;
+ 				imgPosY = imgPosY + e.clientY - downY;
+ 				downX = e.clientX;
+ 				downY = e.clientY;
+ 				drawImage(imgPath, imgPosX, imgPosY);
+ 			}
+			
+ 		};
+		canvas1.onmousedown = function (e) {
+			downX=e.clientX;
+			downY=e.clientY;
+			isdrag=true;
+			///
+		}
+ 		canvas1.onmouseup = function (e) {
+
+			isdrag=false;
+			 now_x=(e.clientX-imgPosX)/imgWidth;
+			 now_y=(e.clientY-imgPosY)/imgHeight;
+			let a='X坐标:'+now_x+'   Y坐标:'+now_y+'<br/>';
+			//let d='ImgXrat:'+now_x/imgWidth+'   ImgYrat:'+now_y/imgHeight+'<br/>';
+			//let b='ccX:'+e.clientX+'   ccY:'+e.clientY+'<br/>';
+			//let c='SImgX:'+imgPosX+'   SImgY:'+imgPosY+'<br/>';
+			$('#showInfo').html(a);
+			
+
+		}
+ 	}
+
+ 	function drawImage(path,x,y) {
+		//context.clearRect(0, 0, canvas.width, canvas.height);
+		
+ 		var img = new Image();
+ 		img.onload = function () {
+			$('#layer1').attr('width', 500);
+			$('#layer1').attr('height', 500);
+			$('#layer2').attr('width', $('#layer1').width());
+			$('#layer2').attr('height', $('#layer1').height());
+			$('#layer3').attr('width', $('#layer1').width());
+			$('#layer3').attr('height', $('#layer1').height());
+			imgWidth=img.width*imgScale;
+			imgHeight=img.height*imgScale;
+ 			context2.drawImage(img, x, y,imgWidth,imgHeight);
+ 	 	}
+ 		img.src = path;
+ 	}
+	function initbtn() {
+      		$('#btnlist').empty();
+      		$('#btnlist').append('<img id="modelbiaozhu"  src="images/1.jpg">');
+      		data_arr[now_people] = [];
+      		let file_path = baseFileSavePath + '//' + imgList[now_pic_idx] + '.txt';
+      		fs.exists(file_path, function (exists) {
+      			if (exists) {
+      				//载入配置文件
+      				console.log("载入配置文件");
+      				fs.readFile(file_path, function (err, data) {
+      					if (err) {
+      						return console.error(err);
+      					}
+      					data_arr = eval(data.toString());
+      					for (let i = 0; i < data_arr[now_people].length; i++) {
+      						let n_btn = $('<div class="obtn obtn-no-save" name=' + data_arr[now_people][i].name + '></div>');
+      						for (let k = 0; k < pos.length; k++) {
+      							if (pos[k].name == data_arr[now_people][i].name) {
+      								n_btn.css({
+      									'left' : pos[k].x*$('#modelbiaozhu').width()-5,
+      									'top' : pos[k].y*$('#modelbiaozhu').height()-5
+      								});
+      								break;
+      							}
+      						}
+      						if (data_arr[now_people][i].x < -10 || data_arr[now_people][i].y < -10) {
+      							n_btn.removeClass('obtn-save');
+      							n_btn.addClass('obtn-no-save');
+      						} else {
+      							n_btn.removeClass('obtn-no-save');
+      							n_btn.addClass('obtn-save');
+      						}
+      						$('#btnlist').append(n_btn);
+      					}
+      					send_base_data();
+      				});
+
+      			} else {
+      				//没有配置文件
+      				console.log("没有配置文件");
+      				//初始化一个空当前数据
+      				init_empty_data();
+      			}
+      		});
+      		send_base_data();
+      	}
+      	function init_empty_data() {
+      		data_arr[now_people] = [];
+      		for (let i = 0; i < pos.length; i++) {
+      			let n_btn = $('<div class="obtn obtn-no-save" name=' + pos[i].name + '></div>');
+      			n_btn.css({
+      				'left' : pos[i].x*$('#modelbiaozhu').width()-5,
+      				'top' : pos[i].y*$('#modelbiaozhu').height()-5
+      			});
+      			$('#btnlist').append(n_btn);
+      			//初始化存储结构
+      			data_arr[now_people].push({
+      				x : uuNum,
+      				y : uuNum,
+      				flag : false,
+      				name : pos[i].name
+      			});
+      		}
+      		save_data_arr();
+      	}
+	 function save_data_arr() {
+      		send_base_data();
+      		if (data_arr.length == 0)
+      			return;
+      		// 这个有问题
+      		let writedata = JSON.stringify(data_arr);
+      		let file_path = baseFileSavePath + '//' + imgList[now_pic_idx] + '.txt';
+      		fs.writeFile(file_path, writedata, {
+      			flag : 'w',
+      			encoding : 'utf-8',
+      			mode : '0666'
+      		}, function (err) {
+      			if (err) {
+      				console.log("文件写入失败")
+      			} else {
+      				console.log("文件写入成功");
+      			}
+      		});
+      		send_base_data();
+      }
+	    function check_now_pos() {
+      		if (now_y < -10 || now_x < -10) {
+      			alert("please select point!");
+      			return false;
+      		}
+      		return true;
+      	}
+      	function delete_now_pos() {
+      		now_y = uuNum;
+      		now_x = uuNum;
+      	}
+	  function flush_person_info() {
+      		let vv = '一共' + data_arr.length + '个人，' + '当前标注第' + (now_people + 1) + '个人';
+      		$('#showperson').val(vv);
+      }
+	  function send_base_data() {
+      		flush_person_info();
+
+      }
+	 function loadImg(idx) {
+			imgPosX=0;
+			imgPosY=0;
+      		let file_path = baseFileOpenPath + '//' + imgList[idx];
+			imgPath=file_path;
+      		$('title').text(file_path);
+			imgScale=1;
+			drawImage(file_path,imgPosX,imgPosY);
+      		//重新初始化
+      		//新图片重第一个人开始看
+      		now_people = 0;
+      		initbtn();
+      	}
+	 function done() {
+		
+	 	if (true) {
+		context3.clearRect(0, 0, canvas1.width, canvas1.height);
+	 		//绘制点
+	 		//context3.beginPath();
+			console.log('imgPosX:' + imgPosX + '  imgPosY:' + imgPosY);
+	 		let size = 5;
+	 		for (let i = 0; i < data_arr.length; i++) {
+	 			for (let k = 0; k < data_arr[i].length; k++) {
+
+	 				let ki_x = (data_arr[i][k].x*imgWidth+imgPosX)/imgWidth;
+	 				let ki_y = (data_arr[i][k].y*imgHeight+imgPosY)/imgHeight;
+	
+
+	 				//console.log('downX:'+downX+'  downY:'+downY);
+	 				
+	 				if (ki_x < -10 || ki_y < -10)
+	 					continue;
+	 				console.log('-----------');
+
+	 				//console.log('ki_x:' + ki_x + '  ki_y:' + ki_y);
+	 				//console.log('data_arr_x:' + data_arr[i][k].x + '  data_arr_y:' + data_arr[i][k].y);
+	 				//console.log(data_arr[i][k]);
+	 				//console.log('imgWidth:' + imgWidth + '  imgHeight:' + imgHeight);
+	 				let xx = parseFloat(ki_x) * parseFloat(imgWidth);
+	 				let yy = parseFloat(ki_y) * parseFloat(imgHeight);
+	 				//填充颜色,默认是黑色
+	 				if (i == now_people) {
+	 					context3.beginPath();
+	 					context3.arc(xx, yy, size, 0, 360, false);
+	 					context3.fillStyle = "#00FF00";
+	 					context3.fill(); //画实心圆
+	 					context3.closePath();
+	 				} else {
+	 					context3.beginPath();
+	 					context3.arc(xx, yy, size, 0, 360, false);
+	 					context3.fillStyle = "red";
+	 					context3.fill(); //画实心圆
+	 					context3.closePath();
+	 				}
+
+	 			}
+
+	 		}
+	 	}
+
+	 }
+     $('#tobig').click(function () {
+      		imgScale+=0.2;
+			drawImage(imgPath,imgPosX,imgPosY);
+      });
+      $('#tosmall').click(function () {
+      		imgScale-=0.2;
+			drawImage(imgPath,imgPosX,imgPosY);
+      });
+      	$('#addnew').click(function () {
+      		//添加一个人
+      		now_people = data_arr.length;
+      		init_empty_data();
+      	});
+	  $('#nextpic').click(function () {
+	  	//判断当前是否存储
+	  	now_pic_idx++;
+	  	if (now_pic_idx > (imgList.length - 1)) {
+	  		now_pic_idx = imgList.length - 1;
+	  		alert('到底了！');
+	  		return;
+	  	}
+	  	loadImg(now_pic_idx);
+	  	//判断data_arr是否存储
+	  });
+	  $('#prepic').click(function () {
+	  	//判断当前是否存储
+	  	now_pic_idx--;
+	  	if (now_pic_idx < 0) {
+	  		now_pic_idx = 0;
+	  		alert('到头了！');
+	  		return;
+	  	}
+	  	loadImg(now_pic_idx);
+	  });
+	    $('#preperson').click(function () {
+      		if (now_people > 0) {
+      			now_people--;
+      		} else {
+      			alert('已经是第一个人了！');
+      		}
+      		initbtn();
+      	});
+      	$('#nextperson').click(function () {
+      		if (now_people < (data_arr.length - 1)) {
+      			now_people++;
+      		} else {
+      			alert('已经是最后一个人了！');
+      		}
+      		initbtn();
+      	});
+	  $("#lockinfo").click(function () {
+      		baseFileOpenPath = $("#openPath").val();
+      		baseFileSavePath = $("#savePath").val();
+      		filePath = $("#filePath").val();
+      		$("#openPath").attr('disabled', 'disabled');
+      		$("#savePath").attr('disabled', 'disabled');
+      		$("#filePath").attr('disabled', 'disabled');
+      		fs.readFile(filePath, function (err, data) {
+      			if (err) {
+      				return console.error(err);
+      			}
+      			var cc = data.toString().split('\n');
+      			imgList = [];
+
+      			for (let i = 0; i < cc.length; i++) {
+      				if ($.trim(cc[i]).length == 0)
+      					continue;
+      				imgList.push($.trim(cc[i]));
+      			}
+      		});
+      });
+	  $("body").on("click", '.obtn', function () {
+      		let name = $(this).attr('name');
+      		for (let i = 0; i < data_arr[now_people].length; i++) {
+      			if (name == data_arr[now_people][i].name) {
+      				if (data_arr[now_people][i].flag == false) {
+      					data_arr[now_people][i].flag = true;
+      					//判断是否有点击过图片
+      					if (check_now_pos()) {
+      						data_arr[now_people][i].x = now_x;
+      						data_arr[now_people][i].y = now_y;
+      						//设置为需要点击图片
+      						delete_now_pos();
+      						$(this).removeClass('obtn-no-save');
+      						$(this).addClass('obtn-save');
+      						//坐标有变化
+      						save_data_arr();
+      					}
+      				} else {
+      					data_arr[now_people][i].flag = false;
+      					data_arr[now_people][i].x = uuNum;
+      					data_arr[now_people][i].y = uuNum;
+      					$(this).removeClass('obtn-save');
+      					$(this).addClass('obtn-no-save');
+      					//坐标有变化
+      					save_data_arr();
+      				}
+      				//只要data_arr[now_people]有变化就存储
+      				break;
+      			}
+      		}
+
+      	});
+	data_arr[now_people] = [];
+ 	createcanvas();
+	drawImage('images/1.jpg',imgPosX,imgPosY);
+	initbtn();
+	setInterval(done,200);
+ })
+
+  </script>
+</body>
+</html>
